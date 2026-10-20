@@ -131,3 +131,16 @@ The `key` of `@HopMetadata` is the metadata plugin ID and the name of the folder
 - **Renaming a key:** never change an existing key without moving the old one to `legacyKeys`, for example `key = "mail-server-connection", legacyKeys = {"MailServerConnection"}`. Objects in the old folder keep loading, and each one moves to the new folder the next time it is saved. Without `legacyKeys`, existing projects silently lose those objects.
 - **Code that works with type keys or metadata files** must go through `HopMetadataUtil.getAllKeys()` / `matchesKey()` or `JsonMetadataSerializer.findFilename()`, not `annotation.key()` alone. Otherwise objects still in a legacy folder are missed.
 - `rdbms` predates this convention and stays as it is.
+
+# Cursor Cloud specific instructions
+
+Cloud Agent VMs already have JDK 21 at `/usr/lib/jvm/java-21-openjdk-amd64`, GTK 3, and Xvfb. There is no system `mvn` on `PATH`. Use `./mvnw` (the wrapper pins Maven 3.9.12).
+
+- The environment install compiles and installs the reactor with tests and static checks skipped:
+
+  `./tools/with-isolated-display.sh ./mvnw -B -Pfast-build -Dassemblies=false -Dmodule.zips=false -Dconfig-doc=false -T2 install`
+
+  `~/.m2` is warm after that. Re-run the same command when a branch changes dependencies.
+- Keep `MAVEN_OPTS` near `-Xmx2g -XX:MaxMetaspaceSize=512m` and parallelism at `-T2`. A wider reactor plus forked compilers exhausts the VM heap.
+- Build or test the `ui` module, and any SWTBot run, through `tools/with-isolated-display.sh`.
+- `hop-run` and `hop-gui` come from the client distribution. Package it with `./mvnw -B -Pfast-build -pl assemblies/client -am package -Dconfig-doc=false`, unzip `assemblies/client/target/hop-client-*.zip`, and run `hop/hop-run.sh` or `hop/hop-gui.sh`.
