@@ -138,9 +138,9 @@ Cloud Agent VMs already have JDK 21 at `/usr/lib/jvm/java-21-openjdk-amd64`, GTK
 
 - The environment install compiles and installs the reactor with tests and static checks skipped:
 
-  `./tools/with-isolated-display.sh ./mvnw -B -Pfast-build -Dassemblies=false -Dmodule.zips=false -Dconfig-doc=false -T2 install`
+  `./tools/with-isolated-display.sh ./mvnw -B -Pfast-build -Dassemblies=false -Dmodule.zips=false -Dconfig-doc=false -T1 install`
 
   `~/.m2` is warm after that. Re-run the same command when a branch changes dependencies.
-- Keep `MAVEN_OPTS` near `-Xmx2g -XX:MaxMetaspaceSize=512m` and parallelism at `-T2`. A wider reactor plus forked compilers exhausts the VM heap.
+- Keep `MAVEN_OPTS` near `-Xmx4g -XX:MaxMetaspaceSize=1g` and parallelism at `-T1`. A 2g heap runs out while compiling `hop-engines-beam` on a cold install.
 - Build or test the `ui` module, and any SWTBot run, through `tools/with-isolated-display.sh`.
 - `hop-run` and `hop-gui` come from the client distribution. Package it with `./mvnw -B -Pfast-build -pl assemblies/client -am package -Dconfig-doc=false`, unzip `assemblies/client/target/hop-client-*.zip`, and run `hop/hop-run.sh` or `hop/hop-gui.sh`.
